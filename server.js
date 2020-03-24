@@ -3,7 +3,8 @@ const express = require('express')
 const morgan = require('morgan')
 const helmet = require('helmet')
 const cors = require('cors') 
-const POKEDEX = require('./pokedex.json')
+// const POKEDEX = require('./pokedex.json')
+const MOVIES = require('./movies.json')
 
 const app = express()
 
@@ -22,27 +23,29 @@ app.use(function validateBearerToken(req, res, next) {
   next()
 })
 
-const validTypes = [`Bug`, `Dark`, `Dragon`, `Electric`, `Fairy`, `Fighting`, `Fire`, `Flying`, `Ghost`, `Grass`, `Ground`, `Ice`, `Normal`, `Poison`, `Psychic`, `Rock`, `Steel`, `Water`]
+const { genres = '', country = '', avg_vote = '' } = req.query;
 
-app.get('/types', function handleGetTypes(req, res) {
-  res.json(validTypes)
-})
-
-app.get('/pokemon', function handleGetPokemon(req, res) {
-  let response = POKEDEX.pokemon;
+app.get('/movies', function handleGetMovies(req, res) {
+  let response = MOVIES.movies;
 
   // filter our pokemon by name if name query param is present
-  if (req.query.name) {
-    response = response.filter(pokemon =>
+  if (req.query.genre) {
+    response = response.filter(movie =>
       // case insensitive searching
-      pokemon.name.toLowerCase().includes(req.query.name.toLowerCase())
+      movie.genre.toLowerCase().includes(req.query.genre.toLowerCase())
     )
   }
 
   // filter our pokemon by type if type query param is present
-  if (req.query.type) {
-    response = response.filter(pokemon =>
-      pokemon.type.includes(req.query.type)
+  if (req.query.country) {
+    response = response.filter(movie =>
+      movie.country.includes(req.query.country)
+    )
+  }
+
+  if (req.query.avg_vote) {
+    response = response.filter(movie => 
+      movie.avg_vote >= Number(req.query.avg_vote)
     )
   }
 
